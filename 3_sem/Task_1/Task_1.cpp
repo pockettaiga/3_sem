@@ -8,7 +8,9 @@ using namespace sf;
 #include <iostream>
 using namespace std;
 
-// #1
+#define SIGN(x) ((x < 0) ? -1 : 1)
+
+
 class comp {
 public:
 	float a;
@@ -19,12 +21,11 @@ public:
 		b = y;
 	}
 
-	comp() {
-		a = 0;
-		b = 0;
-	}
+	comp(float x): comp(x, 0) {}
 
-	void f(int n, comp C) {   // отображение f^n + C
+	comp(): comp(0, 0) {}
+
+	void f(int n, comp C) {  // отображение f^n + C
 		float u, v;
 		for (int i = 0; i < n; i++) {
 			u = a; 
@@ -34,79 +35,40 @@ public:
 		}
 		return;
 	}
-};
 
-// #2
-VertexArray set_Oxy(float size_x, float size_y) {
-	VertexArray Oxy(Lines, 4);
-	Oxy[0].position = Vector2f(0, size_y / 2);
-	Oxy[0].color = Color::Black;
-	Oxy[1].position = Vector2f(size_x, size_y / 2);
-	Oxy[1].color = Color::Black;
-	Oxy[2].position = Vector2f(size_x / 2, size_y);
-	Oxy[2].color = Color::Black;
-	Oxy[3].position = Vector2f(size_x / 2, 0);
-	Oxy[3].color = Color::Black;
-	return Oxy;
-}
-
-VertexArray set_area(int s, float length, float size_x, float size_y) {
-	VertexArray sqr(LineStrip, 5);
-	if (length > ((size_x > size_y) ? size_y : size_x)) {
-		length = size_y;
+	void g() {               // обратное отображение f
+		float u = a;
+		float v = b;
+		a = sqrt((sqrt(u * u + v * v) + u) / 2);
+		b = SIGN(v) * sqrt((sqrt(u * u + v * v) - u) / 2);
+		return;
 	}
-	sqr[0].position = Vector2f(size_x / 2 - length / 2, size_y / 2 - length / 2);
-	sqr[0].color = Color::Black;
-	sqr[1].position = Vector2f(size_x / 2 + length / 2, size_y / 2 - length / 2);
-	sqr[1].color = Color::Black;
-	sqr[2].position = Vector2f(size_x / 2 + length / 2, size_y / 2 + length / 2);
-	sqr[2].color = Color::Black;
-	sqr[3].position = Vector2f(size_x / 2 - length / 2, size_y / 2 + length / 2);
-	sqr[3].color = Color::Black;
-	sqr[4].position = Vector2f(size_x / 2 - length / 2, size_y / 2 - length / 2);
-	sqr[4].color = Color::Black;
-	return sqr;
 };
 
-CircleShape set_vert(comp z_0, comp C, int s, float size_x, float size_y, float k, int n, bool subtask_3) {
-	float R = 2.4;
+CircleShape set_vert(comp z_0, comp C, int s, int size_x, int size_y, float k, int n, bool subtask_3) {
+	float R = 1;
 	CircleShape vert(R);
 	vert.setPosition(z_0.a * k + size_x / 2 - R, size_y / 2 - z_0.b * k - R);
 	if (!subtask_3) {
 		z_0.f(n, C);
 		if ((fabs(z_0.a) > s) || (fabs(z_0.b) > s) || (z_0.a != z_0.a) || (z_0.b != z_0.b))
-			vert.setFillColor(Color(0, 0, 0, 255));
+			vert.setFillColor(Color::Yellow);
 		else
 			vert.setFillColor(Color::Red);
 	}
 	else {
-
-		vert.setFillColor(Color::Yellow);
+		//vert.setFillColor(Color(255, 255, 0));
+		int r, g, b;
 		for (int i = 0; i < n; i++) {
 			z_0.f(1, C);
 			if ((fabs(z_0.a) > s) || (fabs(z_0.b) > s) || (z_0.a != z_0.a) || (z_0.b != z_0.b)) {
-				switch (i) {
-				case 0:
-					vert.setFillColor(Color::Blue);
-					break;
-				case 1:
-					vert.setFillColor(Color::Green);
-					break;
-				case 2:
-					vert.setFillColor(Color::Magenta);
-					break;
-				case 3:
-					vert.setFillColor(Color::Cyan);
-					break;
-				case 4:
-					vert.setFillColor(Color::Red);
-					break;
-				case 5:
-					vert.setFillColor(Color::Black);
-				default:
-					vert.setFillColor(Color(15 * i, 15 * i, 0, 255));
-					break;
-				}
+				r = 51 * i;
+				if (r > 255) r = 255;
+				g = 40 * i;
+				if (g > 255) g = 255;
+				b = 0 * i;
+				if (b > 255) b = 255;
+				vert.setFillColor(Color(r, g, b));
 				break;
 			}
 		}
@@ -114,41 +76,16 @@ CircleShape set_vert(comp z_0, comp C, int s, float size_x, float size_y, float 
 	return vert;
 }
 
+void colorize(int n, comp C, Font font, int size_x, int size_y, bool subtask_3 = false) {
 
-
-void colorize(int n, comp C, Font font, float size_x, float size_y, bool subtask_3 = false) {
 	RenderWindow window(VideoMode(size_x, size_y), "Task 1");
 
-	RectangleShape rect(Vector2f(size_x, size_y));
-
 	int s = 2;     // координаты квадрата (области) на осях (комплексная плоскость)
-	float l = 660; // длина стороны квадрата (области) (пиксели)
-	float h = 100;  // размер сетки
+	float l = 720; // длина стороны квадрата (области) (пиксели)
+	float h = 150;  // размер сетки
 
 	float k = l / (s * 2);          // константа для масштабирования (поделить на нее при переходе от пикселей)
 	float step = (l / k) / (h - 1); // шаг сетки
-
-	VertexArray Oxy = set_Oxy(size_x, size_y);
-
-	VertexArray sqr = set_area(s, l, size_x, size_y);
-
-	int char_size = 15;  // размер шрифта
-
-	Text num_1(to_string(s), font, char_size);
-	num_1.setFillColor(Color::Black);
-	num_1.setPosition(Vector2f(size_x / 2 + l / 2, size_y / 2));
-
-	Text num_2("-" + to_string(s), font, char_size);
-	num_2.setFillColor(Color::Black);
-	num_2.setPosition(Vector2f(size_x / 2 - l / 2 - char_size, size_y / 2));
-
-	Text num_3(to_string(s) + "i", font, char_size);
-	num_3.setFillColor(Color::Black);
-	num_3.setPosition(Vector2f(size_x / 2, size_y / 2 - l / 2 - (char_size + 2)));
-
-	Text num_4("-" + to_string(s) + "i", font, char_size);
-	num_4.setFillColor(Color::Black);
-	num_4.setPosition(Vector2f(size_x / 2, size_y / 2 + l / 2));
 
 	comp z_0((-l / 2) / k + step, (l / 2) / k);
 	CircleShape vert;
@@ -160,14 +97,6 @@ void colorize(int n, comp C, Font font, float size_x, float size_y, bool subtask
 				window.close();
 		}
 		window.clear();
-
-		window.draw(rect);
-		window.draw(Oxy);
-		window.draw(sqr);
-		window.draw(num_1);
-		window.draw(num_2);
-		window.draw(num_3);
-		window.draw(num_4);
 
 		for (int i = 0; i < h - 2; i++) {
 			z_0.b -= step;
@@ -196,19 +125,63 @@ void colorize(int n, comp C, Font font, float size_x, float size_y, bool subtask
 	return;
 }
 
+
+typedef struct tree {
+	comp value;
+	tree* left;
+	tree* right;
+} tree;
+
+tree* get_bin_tree(comp z, int h, int i = 1) {
+	tree* result = (tree*)malloc(sizeof(tree));
+	result->left = nullptr;
+	result->right = nullptr;
+	result->value = z;
+	if (i < h) {
+		//comp root(sqrt((sqrt(z.a * z.a + z.b * z.b) + z.a) / 2), SIGN(z.b) * sqrt((sqrt(z.a * z.a + z.b * z.b) - z.a) / 2));
+		z.g();
+		comp root_(-z.a, -z.b);
+		result->left = get_bin_tree(root_, h, ++i);
+		result->right = get_bin_tree(z, h, i);
+	}
+	return result;
+}
+
+void tree_print(tree* t) {
+	if (!t->value.a && !t->value.b) cout << 0;
+	if (t->value.a) {
+		cout << t->value.a;
+		if (t->value.b > 0) cout << "+";
+	}
+	if (t->value.b) {
+		if (abs(t->value.b) != 1) cout << t->value.b;
+		else if (t->value.b == -1) cout << "-";
+		cout << "i";
+	}
+	cout << "\n";
+	if (t->left) tree_print(t->left);
+	if (t->right) tree_print(t->right);
+}
+
+
 int main() {
-	int n = 10;
-	comp C(-0.5, 0.25);
+	int n = 30;
+	comp C(0.75, -0.25);
 
 	Font font;
 	font.loadFromFile("arial.ttf");
 
-	float size_x = 1280, size_y = 720;
+	int size_x = 1280, size_y = 720;
 
 	bool subtask_2 = false;
 	bool subtask_3 = true;
 
 	colorize(n, C, font, size_x, size_y, subtask_3);
+
+	comp z(0, 2);
+
+	tree* t = get_bin_tree(z, 3);
+	tree_print(t);
 
 	return 0;
 }
