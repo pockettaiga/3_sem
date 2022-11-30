@@ -15,20 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Task_1.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="for_lera.cpp">
+    <ClCompile Include="Task_5.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Image Include="image.jpg">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="README.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="arial.ttf" />
+    <Text Include="matrix.txt" />
   </ItemGroup>
 </Project>

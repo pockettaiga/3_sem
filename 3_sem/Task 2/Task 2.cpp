@@ -34,6 +34,7 @@ void print_index(int* A, int* l, int* r) {
 	int count = 0;
 	int* p = A;
 	while (p) {
+		cout << *p << endl;
 		if (p == l)
 			cout << "l=" << count << "\n";
 		if (p == r) {

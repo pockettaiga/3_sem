@@ -45,7 +45,7 @@ public:
 	}
 };
 
-CircleShape set_vert(comp z_0, comp C, int s, int size_x, int size_y, float k, int n, bool subtask_3) {
+CircleShape set_vert(comp z_0, comp C, float s, int size_x, int size_y, float k, int n, bool subtask_3) {
 	float R = 1;
 	CircleShape vert(R);
 	vert.setPosition(z_0.a * k + size_x / 2 - R, size_y / 2 - z_0.b * k - R);
@@ -76,18 +76,18 @@ CircleShape set_vert(comp z_0, comp C, int s, int size_x, int size_y, float k, i
 	return vert;
 }
 
-void colorize(int n, comp C, Font font, int size_x, int size_y, bool subtask_3 = false) {
+void colorize(int n, comp C, int size_x, int size_y, bool subtask_3 = false) {
 
 	RenderWindow window(VideoMode(size_x, size_y), "Task 1");
 
-	int s = 2;     // координаты квадрата (области) на осях (комплексная плоскость)
-	float l = 720; // длина стороны квадрата (области) (пиксели)
+	float s = 2;      // координаты квадрата (области) на осях (комплексная плоскость)
+	float l = 720;  // длина стороны квадрата (области) (пиксели)
 	float h = 150;  // размер сетки
 
 	float k = l / (s * 2);          // константа для масштабирования (поделить на нее при переходе от пикселей)
-	float step = (l / k) / (h - 1); // шаг сетки
+	float step = (s * 2) / (h - 1); // шаг сетки на комплексной плоскости
 
-	comp z_0((-l / 2) / k + step, (l / 2) / k);
+	comp z_0(-s + step, s);
 	CircleShape vert;
 
 	while (window.isOpen()) {
@@ -132,17 +132,16 @@ typedef struct tree {
 	tree* right;
 } tree;
 
-tree* get_bin_tree(comp z, int h, int i = 1) {
+tree* tree_get(comp z, int h, int i = 1) {
 	tree* result = (tree*)malloc(sizeof(tree));
 	result->left = nullptr;
 	result->right = nullptr;
 	result->value = z;
 	if (i < h) {
-		//comp root(sqrt((sqrt(z.a * z.a + z.b * z.b) + z.a) / 2), SIGN(z.b) * sqrt((sqrt(z.a * z.a + z.b * z.b) - z.a) / 2));
 		z.g();
 		comp root_(-z.a, -z.b);
-		result->left = get_bin_tree(root_, h, ++i);
-		result->right = get_bin_tree(z, h, i);
+		result->left = tree_get(root_, h, ++i);
+		result->right = tree_get(z, h, i);
 	}
 	return result;
 }
@@ -165,22 +164,19 @@ void tree_print(tree* t) {
 
 
 int main() {
-	int n = 30;
+	int n = 10;
 	comp C(0.75, -0.25);
-
-	Font font;
-	font.loadFromFile("arial.ttf");
 
 	int size_x = 1280, size_y = 720;
 
 	bool subtask_2 = false;
 	bool subtask_3 = true;
 
-	colorize(n, C, font, size_x, size_y, subtask_3);
+	colorize(n, C, size_x, size_y, subtask_3);
 
 	comp z(0, 2);
 
-	tree* t = get_bin_tree(z, 3);
+	tree* t = tree_get(z, 3);
 	tree_print(t);
 
 	return 0;
